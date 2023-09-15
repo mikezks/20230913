@@ -1,6 +1,9 @@
 import { createActionGroup, createFeature, createReducer, createSelector, emptyProps, on, props, provideState } from '@ngrx/store';
+import { Actions, createEffect, ofType, provideEffects } from '@ngrx/effects';
 import { Flight } from '../entities/flight';
-import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
+import { EnvironmentProviders, Injectable, inject, makeEnvironmentProviders } from '@angular/core';
+import { FlightService } from '../infrastructure/flight.service';
+import { map, switchMap } from 'rxjs';
 
 
 export interface FlightTicket {
@@ -20,6 +23,7 @@ export interface Passenger {
 export const ticketsActions = createActionGroup({
   source: 'tickets',
   events: {
+    'flights load': props<{ from: string, to: string }>(),
     'flights loaded': props<{ flights: Flight[] }>(),
     'flight update': props<{ flight: Flight }>(),
     'flight clear': emptyProps()
@@ -107,8 +111,28 @@ export const ticketsFeature = createFeature({
   })
 });
 
+@Injectable({
+  providedIn: 'root'
+})
+export class TicketsEffects {
+  private actions = inject(Actions);
+  private flightService = inject(FlightService);
+
+  loadFlights$ = createEffect(
+    () => this.actions.pipe(
+      ofType(ticketsActions.flightsLoad),
+      switchMap(action => this.flightService.find(
+        action.from,
+        action.to
+      )),
+      map(flights => ticketsActions.flightsLoaded({ flights }))
+    )
+  );
+}
+
 export function provideTicketsFeature(): EnvironmentProviders {
   return makeEnvironmentProviders([
-    provideState(ticketsFeature)
+    provideState(ticketsFeature),
+    provideEffects(TicketsEffects)
   ]);
 }
