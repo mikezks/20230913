@@ -1,7 +1,9 @@
 <div class="p40" *ngIf="flight.id !== 0">
   <h2>Flight Edit</h2>
 
-  <div class="mt-10">ShowDetails: {{ showDetails }}</div>
+  <div class="form-group mt-10">
+    ShowDetails: {{ showDetails }}
+  </div>
 
   <form #form="ngForm" appRoundTrip>
     <app-validation-errors
@@ -18,18 +20,32 @@
       Validating ...
     </div>
 
-    <div>
-      <input name="id" [(ngModel)]="flight.id" />
+    <div class="form-group">
+      <label>ID:</label>
+      <input name="id" [(ngModel)]="flight.id" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>From:</label>
       <input
         name="from"
+        class="form-control"
         [(ngModel)]="flight.from"
         [appCity]="['Paris', 'London', 'Berlin']"
         appAsyncCity
         required
         minlength="3"
       />
-      <input name="to" [(ngModel)]="flight.to" />
-      <input name="date" [(ngModel)]="flight.date" />
+    </div>
+
+    <div class="form-group">
+      <label>To:</label>
+      <input name="to" [(ngModel)]="flight.to" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label>Date:</label>
+      <input name="date" [(ngModel)]="flight.date"  class="form-control" />
     </div>
 
     <div>
