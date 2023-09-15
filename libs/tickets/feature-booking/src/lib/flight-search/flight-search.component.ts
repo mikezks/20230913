@@ -1,10 +1,10 @@
-import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { FlightCardComponent } from '../flight-card/flight-card.component';
 import { CityPipe } from '@flight-demo/shared/ui-common';
-import { Flight, FlightService, selectBookingDetails, ticketsActions, ticketsFeature } from '@flight-demo/tickets/domain';
+import { Flight, FlightService, ticketsActions, ticketsFeature } from '@flight-demo/tickets/domain';
 import { Store } from '@ngrx/store';
+import { FlightCardComponent } from '../flight-card/flight-card.component';
 
 @Component({
   selector: 'app-flight-search',
@@ -30,7 +30,7 @@ export class FlightSearchComponent implements OnInit{
 
   ngOnInit(): void {
     const bookingDetails = this.store.selectSignal(
-      selectBookingDetails
+      ticketsFeature.selectBookingDetails
     );
 
     this.flights$.subscribe(() => console.log(bookingDetails()));

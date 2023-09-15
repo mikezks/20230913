@@ -75,31 +75,37 @@ export const ticketsFeature = createFeature({
       ...state,
       flights: action.flights
     })),
-  )
+  ),
+  extraSelectors: ({
+    selectFlights,
+    selectPassengers,
+    selectFlightTickets,
+    selectFlightTicketIds
+  }) => ({
+    selectBookingDetails: createSelector(
+      // Selectors
+      selectFlights,
+      selectPassengers,
+      selectFlightTickets,
+      selectFlightTicketIds,
+      // Projector
+      (flights, passengers, tickets, ticketIds) => {
+        const ticketDetails = ticketIds.map(
+          id => tickets[id]
+        );
+
+        const bookingDetails = ticketDetails.map(
+          ticketDetails => ({
+            flight: flights[ticketDetails.flightId],
+            passenger: passengers[ticketDetails.passengerId],
+          })
+        );
+
+        return bookingDetails;
+      }
+    )
+  })
 });
-
-export const selectBookingDetails = createSelector(
-  // Selectors
-  ticketsFeature.selectFlights,
-  ticketsFeature.selectPassengers,
-  ticketsFeature.selectFlightTickets,
-  ticketsFeature.selectFlightTicketIds,
-  // Projector
-  (flights, passengers, tickets, ticketIds) => {
-    const ticketDetails = ticketIds.map(
-      id => tickets[id]
-    );
-
-    const bookingDetails = ticketDetails.map(
-      ticketDetails => ({
-        flight: flights[ticketDetails.flightId],
-        passenger: passengers[ticketDetails.passengerId],
-      })
-    );
-
-    return bookingDetails;
-  }
-);
 
 export function provideTicketsFeature(): EnvironmentProviders {
   return makeEnvironmentProviders([
