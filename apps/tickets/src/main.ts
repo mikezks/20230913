@@ -1,5 +1,8 @@
 import { provideHttpClient } from '@angular/common/http';
-import { importProvidersFrom } from '@angular/core';
+import { importProvidersFrom, isDevMode } from '@angular/core';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { MatDialogModule } from '@angular/material/dialog';
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
@@ -14,6 +17,9 @@ bootstrapApplication(AppComponent, {
   providers: [
     provideHttpClient(),
     provideRouter(APP_ROUTES, withPreloading(PreloadAllModules)),
+    provideStore(),
+    provideEffects(),
+    isDevMode() ? provideStoreDevtools() : [],
     importProvidersFrom(MatDialogModule),
   ],
 });
