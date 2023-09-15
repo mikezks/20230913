@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CityPipe } from '@flight-demo/shared/ui-common';
-import { Flight, ticketsActions, ticketsFeature } from '@flight-demo/tickets/domain';
-import { Store } from '@ngrx/store';
+import { Flight, injectTicketsFeature } from '@flight-demo/tickets/domain';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
 
 @Component({
@@ -13,12 +12,11 @@ import { FlightCardComponent } from '../flight-card/flight-card.component';
   styleUrls: ['./flight-search.component.css'],
   imports: [CommonModule, FormsModule, CityPipe, FlightCardComponent],
 })
-export class FlightSearchComponent implements OnInit{
-  private store = inject(Store);
+export class FlightSearchComponent {
+  protected ticketsFeature = injectTicketsFeature();
 
   from = 'Graz';
   to = 'Hamburg';
-  flights$ = this.store.select(ticketsFeature.selectFlights);
   selectedFlight: Flight | undefined;
 
   basket: Record<number, boolean> = {
@@ -26,28 +24,11 @@ export class FlightSearchComponent implements OnInit{
     5: true,
   };
 
-  ngOnInit(): void {
-    const bookingDetails = this.store.selectSignal(
-      ticketsFeature.selectBookingDetails
-    );
-
-    this.flights$.subscribe(() => console.log(bookingDetails()));
-  }
-
-  search(): void {
-    if (!this.from || !this.to) {
-      return;
-    }
-
-    // Reset properties
-    this.selectedFlight = undefined;
-
-    this.store.dispatch(
-      ticketsActions.flightsLoad({
-        from: this.from,
-        to: this.to
-      })
-    );
+  constructor() {
+    effect(() => {
+      this.ticketsFeature.flights();
+      console.log(this.ticketsFeature.bookingDetails());
+    });
   }
 
   select(f: Flight): void {

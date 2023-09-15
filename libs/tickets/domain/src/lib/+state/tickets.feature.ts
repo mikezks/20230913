@@ -1,4 +1,4 @@
-import { createActionGroup, createFeature, createReducer, createSelector, emptyProps, on, props, provideState } from '@ngrx/store';
+import { Store, createActionGroup, createFeature, createReducer, createSelector, emptyProps, on, props, provideState } from '@ngrx/store';
 import { Actions, createEffect, ofType, provideEffects } from '@ngrx/effects';
 import { Flight } from '../entities/flight';
 import { EnvironmentProviders, Injectable, inject, makeEnvironmentProviders } from '@angular/core';
@@ -135,4 +135,16 @@ export function provideTicketsFeature(): EnvironmentProviders {
     provideState(ticketsFeature),
     provideEffects(TicketsEffects)
   ]);
+}
+
+export function injectTicketsFeature() {
+  const store = inject(Store);
+
+  return {
+    flights: store.selectSignal(ticketsFeature.selectFlights),
+    bookingDetails: store.selectSignal(ticketsFeature.selectBookingDetails),
+    search: (from: string, to: string) => store.dispatch(
+      ticketsActions.flightsLoad({ from, to })
+    )
+  };
 }
