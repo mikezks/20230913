@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
 import { CityPipe } from '@flight-demo/shared/ui-common';
-import { Flight, FlightService, ticketsActions, ticketsFeature } from '@flight-demo/tickets/domain';
+import { Flight, FlightService, selectBookingDetails, ticketsActions, ticketsFeature } from '@flight-demo/tickets/domain';
 import { Store } from '@ngrx/store';
 
 @Component({
@@ -13,11 +13,11 @@ import { Store } from '@ngrx/store';
   styleUrls: ['./flight-search.component.css'],
   imports: [CommonModule, FormsModule, CityPipe, FlightCardComponent],
 })
-export class FlightSearchComponent {
+export class FlightSearchComponent implements OnInit{
   private store = inject(Store);
 
-  from = 'London';
-  to = 'New York';
+  from = 'Graz';
+  to = 'Hamburg';
   flights$ = this.store.select(ticketsFeature.selectFlights);
   selectedFlight: Flight | undefined;
 
@@ -27,6 +27,14 @@ export class FlightSearchComponent {
   };
 
   private flightService = inject(FlightService);
+
+  ngOnInit(): void {
+    const bookingDetails = this.store.selectSignal(
+      selectBookingDetails
+    );
+
+    this.flights$.subscribe(() => console.log(bookingDetails()));
+  }
 
   search(): void {
     if (!this.from || !this.to) {
